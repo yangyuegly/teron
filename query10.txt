@@ -1,0 +1,18 @@
+            "WITH oa as (SELECT airport_id as oa_id, airport_code as oa_code from airports WHERE city = ? AND state = ?),"
+
+            +"da as (SELECT airport_id as da_id, airport_code as da_code from airports WHERE city = ? AND state = ?),"
+
+            + "eligible_first_flight as (SELECT airline_code as one_airline_code, flight_num as one_flight_number, oa_code as one_o_code,  strftime('%Y-%m-%d %H:%M',datetime((strftime('%s',departure_dt)+depart_diff*60),'unixepoch')) as one_actual_depart, airports.airport_code as one_d_code, airports.airport_id as one_d_id, strftime('%Y-%m-%d %H:%M',datetime((strftime('%s',arrival_dt)+arrival_diff*60),'unixepoch')) as one_actual_arrival FROM flights JOIN oa on flights.origin_airport_id = oa.oa_id JOIN airlines on flights.airline_id = airlines.airline_id INNER JOIN airports on flights.dest_airport_id = airports.airport_id WHERE flights.dest_airport_id NOT IN (SELECT da_id FROM da) AND substr(one_actual_depart,1,10) = ? AND substr(one_actual_arrival,1,10) = ? AND cancelled = 0),"
+
+            +"eligible_second_flight as (SELECT airline_code as two_airline_code, flight_num as two_flight_number, airports.airport_code as two_d_code, airports.airport_id as two_d_id, strftime('%Y-%m-%d %H:%M',datetime((strftime('%s',departure_dt)+depart_diff*60),'unixepoch')) as two_actual_depart, one_d_code as two_o_code, strftime('%Y-%m-%d %H:%M',datetime((strftime('%s',arrival_dt)+arrival_diff*60),'unixepoch')) as two_actual_arrival FROM flights JOIN eligible_first_flight on flights.origin_airport_id = eligible_first_flight.one_d_id JOIN airlines on flights.airline_id = airlines.airline_id JOIN airports on flights.dest_airport_id = airports.airport_id WHERE flights.origin_airport_id NOT IN (SELECT oa_id FROM oa) AND flights.dest_airport_id NOT IN (SELECT da_id FROM da) substr(two_actual_depart,1,10) = ? AND substr(two_actual_arrival,1,10) = ? AND cancelled = 0),"
+
+  
+            +"eligible_third_flight as (SELECT airline_code as third_airline_code, flight_num as third_flight_number, da_code as third_d_code, strftime('%Y-%m-%d %H:%M',datetime((strftime('%s',departure_dt)+depart_diff*60),'unixepoch')) as third_actual_depart, airports.airport_code as third_o_code, strftime('%Y-%m-%d %H:%M',datetime((strftime('%s',arrival_dt)+arrival_diff*60),'unixepoch')) as third_actual_arrival FROM flights JOIN da on flights.dest_airport_id = da.da_id JOIN eligible_second_flight on flights.origin_airport_id = eligible_second_flight.two_d_id JOIN airlines on flights.airline_id = airlines.airline_id WHERE flights.origin_airport_id NOT IN (SELECT oa_id FROM oa) AND substr(two_actual_depart,1,10) = ? AND substr(two_actual_arrival,1,10) = ? AND cancelled = 0),"
+
+
+            +"eligible_itinerary_one as (SELECT * FROM eligible_first_flight JOIN eligible_second_flight ON eligible_first_flight.one_d_code = eligible_second_flight.two_o_code WHERE datetime((strftime('%s',one_actual_arrival)),'unixepoch')<datetime((strftime('%s',two_actual_depart)),'unixepoch')) "
+
+            +"eligible_itinerary_two as (SELECT * FROM eligible_itinerary_one JOIN eligible_third_flight ON eligible_itinerary_one.two_d_code = eligible_third_flight.third_o_code WHERE datetime((strftime('%s',two_actual_arrival)),'unixepoch')<datetime((strftime('%s',third_actual_depart)),'unixepoch')) "
+
+
+            +"SELECT one_airline_code, one_flight_number, one_o_code, one_actual_depart, one_d_code,one_actual_arrival, two_airline_code, two_flight_number, two_o_code, two_actual_depart, two_d_code,two_actual_arrival, third_airline_code, third_flight_number, third_o_code, third_actual_depart, third_d_code, third_actual_arrival, (strftime('%s',third_actual_arrival)- strftime('%s',one_actual_depart)) as duration FROM eligible_itinerary");
