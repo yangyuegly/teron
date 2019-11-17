@@ -6,6 +6,7 @@ from trontypes import CellType, PowerupType
 from constants import *
 import random
 import math
+from heuristics import *
 
 # Throughout this file, ASP means adversarial search problem.
 # Trap *;
@@ -41,6 +42,7 @@ class StudentBot:
         beta = WIN
         state = asp.get_start_state()
         locs = state.player_locs
+
         board = state.board
         player_num = state.ptm
         loc = locs[player_num]
@@ -59,11 +61,10 @@ class StudentBot:
             if result >= best_score:
                 best_score = result
                 best_action = action
-        print(best_action)
         return best_action
 
     def max_value(self, asp, state, alpha, beta, player_num, cutoff):
-
+        print(dijkstra(state))
         if asp.is_terminal_state(state):
             return asp.evaluate_state(state)[player_num]  # max's turn
         if cutoff == 0:

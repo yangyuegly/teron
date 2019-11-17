@@ -99,6 +99,8 @@ class TronProblem(AdversarialSearchProblem):
 
         # prepare parts of result state
         board = [[elt for elt in row] for row in state.board]
+        print("height: " + str(len(board)))
+        print(len(board[0]))
         player_locs = [loc for loc in state.player_locs]
         next_ptm = (state.ptm + 1) % self._num_players
         player_powerups = copy.deepcopy(state.player_powerups)
