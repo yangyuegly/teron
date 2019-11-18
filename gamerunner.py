@@ -7,6 +7,7 @@ from collections import defaultdict
 import support
 import random
 import numpy as np
+from heuristics import *
 
 
 def run_game(asp, bots, visualizer=None, delay=0.2, max_wait=0.3, colored=True):

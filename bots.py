@@ -19,8 +19,7 @@ class StudentBot:
     """ Write your student bot here"""
 
     def __init__(self, cutoff=6):
-        order = ["U", "D", "L", "R"]
-        random.shuffle(order)
+        order = ["D", "U", "R", "L"]
         self.cutoff = cutoff
 
     def decide(self, asp):
@@ -34,8 +33,8 @@ class StudentBot:
         return self.alpha_beta(asp, self.cutoff)
 
     def alpha_beta(self, asp, cutoff):  # propogate backwards
-        """                                                                         
-            alpha-beta cutoff                                                    
+        """
+            alpha-beta cutoff
         """
 
         alpha = LOSE
@@ -64,11 +63,16 @@ class StudentBot:
         return best_action
 
     def max_value(self, asp, state, alpha, beta, player_num, cutoff):
-        print(dijkstra(state))
+        # print(dijkstra(state, 0))
+        if cutoff <= 0:
+            voronoi_val = voronoi(state)
+            print("voronoi"+str(voronoi_val))
+            return voronoi_val if (voronoi_val != 0) else simple_eval_function(asp, state, player_num)
         if asp.is_terminal_state(state):
+            print('reached_terminal_state')
+            print(state)
             return asp.evaluate_state(state)[player_num]  # max's turn
-        if cutoff == 0:
-            return self.simple_eval_function(asp, state, player_num)
+
         locs = state.player_locs
         loc = locs[player_num]
         actions = list(TronProblem.get_safe_actions(state.board, loc))
@@ -87,10 +91,15 @@ class StudentBot:
         return optimal_action
 
     def min_value(self, asp, state, alpha, beta, player_num, cutoff):
+        if cutoff <= 0:
+            voronoi_val = voronoi(state)
+            print("voronoi"+str(voronoi_val))
+            return voronoi_val if (voronoi_val != 0) else simple_eval_function(asp, state, player_num)
         if asp.is_terminal_state(state):
+            print('reached_terminal_state')
+            print(state)
             return asp.evaluate_state(state)[player_num]  # min's turn
-        if cutoff == 0:
-            return self.simple_eval_function(asp, state, player_num)
+
         locs = state.player_locs
         loc = locs[player_num]
         actions = list(TronProblem.get_safe_actions(state.board, loc))
@@ -115,7 +124,7 @@ class StudentBot:
         loc = locs[player_num]
         actions = list(TronProblem.get_safe_actions(state.board, loc))
         evaluation = len(actions)
-        print(evaluation)
+        print("evaluation: " + str(evaluation))
         return evaluation/2.0
 
     def cleanup(self):

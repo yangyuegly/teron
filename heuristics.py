@@ -5,12 +5,21 @@ from tronproblem import *
 from collections import deque
 
 
-def voronoi(we, opp, state):
+def voronoi(state):
     # calculate "I" path cost
-        dijkstra(state,)
-
+    gov_cost = dijkstra(state, 0)
+    gov_points = 0
     # calculate "OPP" path cost
-    pass
+    opp_cost = dijkstra(state, 1)
+    opp_points = 0
+    board = state.board
+    for r in range(1, len(board)-1):
+        for c in range(1, len(board[0])-1):
+            if gov_cost[r, c] < opp_cost[r, c]:
+                gov_points += 1
+            if opp_cost[r, c] < gov_cost[r, c]:
+                opp_cost += 1
+    return gov_points-opp_points
 
 
 def dijkstra(state, player_num):
@@ -29,8 +38,6 @@ def dijkstra(state, player_num):
 
     # set distance for neighboring cells
     all_vertices = deque(get_next_state(curr_board, loc))
-    # print("all vertices")
-    # print(all_vertices)
     for initial_loc in all_vertices:
         dists[initial_loc[0], initial_loc[1]] = 1
 
@@ -43,6 +50,7 @@ def dijkstra(state, player_num):
             if visited[l[0], l[1]] == 0:
                 all_vertices.append(l)
                 visited[l[0], l[1]] = 1
+
     return dists
 
 
@@ -51,9 +59,9 @@ def get_next_state(curr_board, loc):
     next_locs = []
     for move in TronProblem.get_safe_actions(curr_board, loc):
         next_loc = TronProblem.move(loc, move)
-        print('move: '+move+' loc: '+str(next_loc))
-
+        #print('move: '+move+' loc: '+str(next_loc))
         next_locs.append(next_loc)
+
     # print("next_locs:")
     # print(next_locs)
     return next_locs
