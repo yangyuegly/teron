@@ -13,6 +13,8 @@ def voronoi(state):
     opp_cost = dijkstra(state, 1)
     opp_points = 0
     board = state.board
+    trap_is_good = trap(state)
+    print("trap_is_good:"+str(trap_is_good))
     for r in range(1, len(board)-1):
         for c in range(1, len(board[0])-1):
             if gov_cost[r, c] < opp_cost[r, c]:
@@ -21,8 +23,16 @@ def voronoi(state):
                 opp_points += 1
     print(gov_points)
     print(opp_points)
-    return (float(gov_points-opp_points))/(gov_points+opp_points)
+    return ((float(gov_points-opp_points))/(gov_points+opp_points))/2.0+0.5
 
+def trap(state):
+    trap_is_good = True
+    gov_loc = state.player_locs[0]
+    opp_loc = state.player_locs[1]
+    if(abs(gov_loc[0]-opp_loc[0])<=2 or abs(gov_loc[1]-opp_loc[1])<=2):
+        trap_is_good = False
+    return trap_is_good
+    
 
 def dijkstra(state, player_num):
     state_copy =copy.deepcopy(state)
