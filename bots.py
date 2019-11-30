@@ -19,7 +19,7 @@ import copy
 class StudentBot:
     """ Write your student bot here"""
 
-    def __init__(self, cutoff=4):
+    def __init__(self, cutoff=5):
         order = ["D", "U", "R", "L"]
         self.step = 0
         self.cutoff = cutoff
@@ -64,7 +64,6 @@ class StudentBot:
             result = self.min_value(
                 asp, child_state, alpha, beta, child_num, cutoff-1,initial_player)
             
-            print("first action: "+action + " result:" +str(result))
             
             alpha = max(alpha, result)
         
@@ -74,19 +73,14 @@ class StudentBot:
         return best_action
 
     def max_value(self, asp, state, alpha, beta, player_num, cutoff,initial_player):
-#        print("player_num="+str(player_num))
         player_num = state.ptm
 
 #        print("state.ptm="+str(player_num))
         if asp.is_terminal_state(state):
-            #print(state.board)
-            print('cutoff'+str(cutoff))
-            print('reached_terminal_state')
-            print("initial player num: " + str(initial_player))
+
             return asp.evaluate_state(state)[initial_player]  # max's turn
         if cutoff <= 0:
             voronoi_val = voronoi(state)
-            print("voronoi"+str(voronoi_val))
             return voronoi_val 
 
 
@@ -94,9 +88,7 @@ class StudentBot:
         loc = locs[player_num]
         actions = list(TronProblem.get_safe_actions(state.board, loc))
         optimal_action = LOSE
-        print("cutoff:"+ str(cutoff))
-        print("max action")
-        print(actions)
+
         if(len(actions)==0):
             actions = ["R"]
         for action in actions:
@@ -107,12 +99,9 @@ class StudentBot:
             curr = self.min_value(
                 asp, child_state, alpha, beta, child_num, cutoff-1,initial_player)
 
-            print("action:"+ action)
-            print("curr comparison: "+str(curr))
+
             if curr > optimal_action:
                 optimal_action = curr
-
-            print("optimal comparison: "+str(optimal_action))
 
             if optimal_action >= beta:
                 return optimal_action
@@ -128,18 +117,14 @@ class StudentBot:
 
 #        print("min player num: " + str(player_num))
         if asp.is_terminal_state(state):
-            print('reached_terminal_state')
-            print(asp.evaluate_state(state)[initial_player])
-            print("initial player num: " + str(initial_player)) 
+
             return asp.evaluate_state(state)[initial_player]  # min's turn
         if cutoff <= 0:
             voronoi_val = voronoi(state)
-            print("voronoi"+str(voronoi_val))
             return voronoi_val
         #locs = state.player_locs
         #loc = locs[player_num]
         actions = list(TronProblem.get_safe_actions(state.board, loc))
-        print(actions)
         optimal_action = WIN
         if(len(actions)==0):
             actions = ["R"]
@@ -171,7 +156,6 @@ class StudentBot:
         loc = locs[player_num]
         actions = list(TronProblem.get_safe_actions(state.board, loc))
         evaluation = len(actions)
-        print("evaluation: " + str(evaluation))
         return evaluation/2.0
 
     def cleanup(self):

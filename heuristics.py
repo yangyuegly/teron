@@ -14,15 +14,13 @@ def voronoi(state):
     opp_points = 0
     board = state.board
     trap_is_good = trap(state)
-    print("trap_is_good:"+str(trap_is_good))
     for r in range(1, len(board)-1):
         for c in range(1, len(board[0])-1):
             if gov_cost[r, c] < opp_cost[r, c]:
                 gov_points += 1
             if opp_cost[r, c] < gov_cost[r, c]:
                 opp_points += 1
-    print(gov_points)
-    print(opp_points)
+
     return ((float(gov_points-opp_points))/(gov_points+opp_points))/2.0+0.5
 
 def trap(state):
@@ -67,13 +65,10 @@ def dijkstra(state, player_num):
 
 
 def get_next_state(curr_board, loc):
-    # print('curr loc:'+str)
     next_locs = []
+
     for move in TronProblem.get_safe_actions(curr_board, loc):
         next_loc = TronProblem.move(loc, move)
-        #print('move: '+move+' loc: '+str(next_loc))
         next_locs.append(next_loc)
 
-    # print("next_locs:")
-    # print(next_locs)
     return next_locs
