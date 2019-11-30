@@ -7,6 +7,7 @@ from constants import *
 import random
 import math
 from heuristics import *
+import copy
 
 # Throughout this file, ASP means adversarial search problem.
 # Trap *;
@@ -18,10 +19,10 @@ from heuristics import *
 class StudentBot:
     """ Write your student bot here"""
 
-    def __init__(self, cutoff=6):
+    def __init__(self, cutoff=1):
         order = ["D", "U", "R", "L"]
         self.cutoff = cutoff
-
+        self.BOT_NAME = "Moon River"
     def decide(self, asp):
         """
         Input: asp, a TronProblem
@@ -54,6 +55,8 @@ class StudentBot:
 
         for action in first_actions:
             child_state = asp.transition(state, action)
+            player_num = child_state.ptm
+
             result = self.min_value(
                 asp, child_state, alpha, beta, player_num, cutoff-1)
             alpha = max(alpha, result)
@@ -63,15 +66,16 @@ class StudentBot:
         return best_action
 
     def max_value(self, asp, state, alpha, beta, player_num, cutoff):
-        # print(dijkstra(state, 0))
+        if asp.is_terminal_state(state):
+            #print(state.board)
+            print('cutoff'+str(cutoff))
+            print('reached_terminal_state')
+            return asp.evaluate_state(state)[player_num]  # max's turn
         if cutoff <= 0:
             voronoi_val = voronoi(state)
             print("voronoi"+str(voronoi_val))
             return voronoi_val if (voronoi_val != 0) else simple_eval_function(asp, state, player_num)
-        if asp.is_terminal_state(state):
-            print('reached_terminal_state')
-            print(state)
-            return asp.evaluate_state(state)[player_num]  # max's turn
+
 
         locs = state.player_locs
         loc = locs[player_num]
@@ -80,6 +84,8 @@ class StudentBot:
 
         for action in actions:
             child_state = asp.transition(state, action)
+            player_num = child_state.ptm
+
             curr = self.min_value(
                 asp, child_state, alpha, beta, player_num, cutoff-1)
             if curr > optimal_action:
@@ -91,22 +97,22 @@ class StudentBot:
         return optimal_action
 
     def min_value(self, asp, state, alpha, beta, player_num, cutoff):
+        player_num = state.ptm
+        if asp.is_terminal_state(state):
+            print('reached_terminal_state')
+            print(asp.evaluate_state(state)[player_num])
+            return asp.evaluate_state(state)[player_num]  # min's turn
         if cutoff <= 0:
             voronoi_val = voronoi(state)
             print("voronoi"+str(voronoi_val))
             return voronoi_val if (voronoi_val != 0) else simple_eval_function(asp, state, player_num)
-        if asp.is_terminal_state(state):
-            print('reached_terminal_state')
-            print(state)
-            return asp.evaluate_state(state)[player_num]  # min's turn
-
         locs = state.player_locs
         loc = locs[player_num]
-        actions = list(TronProblem.get_safe_actions(state.board, loc))
+        actions = list(TronProblem.get_safe_actions(state_copy.board, loc))
         optimal_action = LOSE
-
         for action in actions:
             child_state = asp.transition(state, action)
+            player_num = child_state.ptm
             curr = self.max_value(
                 asp, child_state, alpha, beta, player_num, cutoff-1)
             if curr < optimal_action:
@@ -118,7 +124,7 @@ class StudentBot:
 
     def simple_eval_function(self, asp, state, player_num):
         """
-        return the number of available actions as the value of the state 
+        return the number of available actions as the value of the state
         """
         locs = state.player_locs
         loc = locs[player_num]

@@ -137,7 +137,7 @@ def main():
 class Argument_Defaults:
     MAP = "./maps/hunger_games.txt"
     MAX_WAIT = 0.3
-    BOTS = ["student", "wall"]
+    BOTS = ["student", "ta2"]
     IMAGE_DELAY = 0.2
 
 

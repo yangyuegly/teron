@@ -3,7 +3,7 @@ from constants import *
 import numpy as np
 from tronproblem import *
 from collections import deque
-
+import copy
 
 def voronoi(state):
     # calculate "I" path cost
@@ -23,9 +23,9 @@ def voronoi(state):
 
 
 def dijkstra(state, player_num):
-
-    curr_board = state.board
-    loc = state.player_locs[player_num]
+    state_copy =copy.deepcopy(state)
+    curr_board = state_copy.board
+    loc = state_copy.player_locs[player_num]
 
     # distances to all non-starting vertices are inifinit
     dists = np.zeros((HEIGHT, WIDTH))
