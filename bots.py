@@ -80,7 +80,7 @@ class StudentBot:
 
             return asp.evaluate_state(state)[initial_player]  # max's turn
         if cutoff <= 0:
-            voronoi_val = voronoi(state)
+            voronoi_val = voronoi(state,initial_player)
             return voronoi_val 
 
 
@@ -120,7 +120,7 @@ class StudentBot:
 
             return asp.evaluate_state(state)[initial_player]  # min's turn
         if cutoff <= 0:
-            voronoi_val = voronoi(state)
+            voronoi_val = voronoi(state,initial_player)
             return voronoi_val
         #locs = state.player_locs
         #loc = locs[player_num]
@@ -129,6 +129,7 @@ class StudentBot:
         if(len(actions)==0):
             actions = ["R"]
         for action in actions:
+            print(action)
             child_state = asp.transition(state, action)
             child_num = child_state.ptm
  #           print("min child num: " + str(child_num))
