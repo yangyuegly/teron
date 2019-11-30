@@ -18,8 +18,10 @@ def voronoi(state):
             if gov_cost[r, c] < opp_cost[r, c]:
                 gov_points += 1
             if opp_cost[r, c] < gov_cost[r, c]:
-                opp_cost += 1
-    return gov_points-opp_points
+                opp_points += 1
+    print(gov_points)
+    print(opp_points)
+    return (float(gov_points-opp_points))/(gov_points+opp_points)
 
 
 def dijkstra(state, player_num):
